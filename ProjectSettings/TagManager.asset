@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - SafeZone
+  - EndZone
+  - Enemy
   layers:
   - Default
   - TransparentFX

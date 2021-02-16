@@ -16,11 +16,13 @@ public class AI : MonoBehaviour
     private bool isAtEndPoint;
     private bool isAtStartingPoint;
 
-    private Player player;
+    public Player player;
 
     public float speed;
 
     public AIState aiState;
+
+    private Transform currentDestination;
 
     public enum AIState
     {
@@ -29,11 +31,14 @@ public class AI : MonoBehaviour
 
     void Start()
     {
-        player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
+        isAtStartingPoint = true;
+        
     }
 
     void Update()
     {
+        CheckActivePlayer();
+
         if (CheckPlayerInRange())
         {
             if (!player.InSafeZone())
@@ -43,15 +48,20 @@ public class AI : MonoBehaviour
             else
             {
                 Patrol();
-                //GoBackToPatrolStartingPosition();
+                
             }
 
         }
         else
         {
             Patrol();
-            //GoBackToPatrolStartingPosition();
+          
         }
+    }
+
+    private void CheckActivePlayer()
+    {        
+        player = GameManager.instance.currentPlayer.GetComponent<Player>();    
     }
 
     private void ChasePlayer()
@@ -61,54 +71,31 @@ public class AI : MonoBehaviour
         aiState = AIState.chasing;
         isChasing = true;
 
-    }
+    }  
 
-    private void GoBackToPatrolStartingPosition()
-    {
-        transform.position = Vector2.MoveTowards(transform.position, patrolStartPoint.transform.position, speed * Time.deltaTime);
-        isChasing = false;
-    }
-
-    private void CheckPatrolCondition()
-    {
-        if (Vector2.Distance(transform.position, patrolStartPoint.position) < 0.02f)
-        {
-            readyToPatrol = true;
-        }
-        else
-        {
-            readyToPatrol = false;
-        }
-    }
-
-    private void Patrol(Transform destination)
+    private void Patrol()
     {
         if(isAtEndPoint)
-        {
-            GoBackToPatrolStartingPosition();
+        {            
+            SetDestination(patrolStartPoint);
         }
         else if(isAtStartingPoint)
         {
-            GoToEndPosition();
+            SetDestination(patrolEndPoint);
         }
 
-        if (Vector2.Distance(transform.position, patrolEndPoint.position) < 0.02f)
+        if (Vector2.Distance(transform.position, patrolEndPoint.position) < 0.02f && !isAtEndPoint)
         {
             isAtEndPoint = true;
             isAtStartingPoint = false;
         }
-        else
+        else if(Vector2.Distance(transform.position, patrolStartPoint.position) < 0.02f && !isAtStartingPoint)
         {
             isAtEndPoint = false;
             isAtStartingPoint = true;
         }
 
-    }
-
-    private void GoToEndPosition()
-    {
-        transform.position = Vector2.MoveTowards(transform.position, patrolEndPoint.transform.position, speed * Time.deltaTime);
-    }
+    }  
 
     private bool CheckPlayerInRange()
     {
@@ -122,4 +109,11 @@ public class AI : MonoBehaviour
 
         }
     }
+
+    private void SetDestination(Transform destinationPoint)
+    {
+        currentDestination = destinationPoint;
+        transform.position = Vector2.MoveTowards(transform.position, destinationPoint.position, speed * Time.deltaTime);
+    }
+
 }
