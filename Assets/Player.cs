@@ -7,17 +7,26 @@ public class Player : MonoBehaviour
     public float speed;
     public FixedJoystick fixedJoystick;
     private Rigidbody2D rb;
+    public Vector3 startingPoint;
 
     private bool inSafeZone;
-
+    private bool endZoneTouched;
     private GameManager gameManger;
 
     private Animator animator;
     private Vector2 movement;
+
+    public PlayerType playerType;
+
+    public enum PlayerType
+    {
+        GREEN,RED
+    }
+    
     public void Awake()
     {
       //  fixedJoystick = GameObject.Find("Fixed Joystick").GetComponent<FixedJoystick>();
-        speed = 5;
+        speed = 15;
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
     }
@@ -25,6 +34,7 @@ public class Player : MonoBehaviour
     public void Start()
     {
         gameManger = GameManager.instance;
+        startingPoint = transform.localPosition;
     }
 
     public void FixedUpdate()
@@ -52,7 +62,7 @@ public class Player : MonoBehaviour
         
 
         float posX = Mathf.Clamp(transform.position.x, -17f, 10f);
-        float posY = Mathf.Clamp(transform.position.y, -5f, 13f);
+        float posY = Mathf.Clamp(transform.position.y, -7.5f, 13f);
 
         transform.position = new Vector3(posX, posY, 0);
     }
@@ -90,9 +100,27 @@ public class Player : MonoBehaviour
         else if (collision.CompareTag("EndZone"))
         {
             inSafeZone = true;
-            gameManger.GreenScoreUp();
-            SoundManager.instance.PlaywinSound();
-            StartCoroutine(EndPointReached());
+            endZoneTouched = true;           
+
+        }
+
+        else if (collision.CompareTag("StartZone"))
+        {
+            inSafeZone = true;
+            if(endZoneTouched)
+            {
+                if(playerType.Equals(PlayerType.GREEN))
+                {
+                    gameManger.GreenScoreUp();
+                }
+                else if(playerType.Equals(PlayerType.RED))
+                {
+                    gameManger.RedScoreUp();
+                }
+               
+                SoundManager.instance.PlaywinSound();
+                StartCoroutine(EndPointReached());
+            }
 
         }
     }
@@ -101,7 +129,7 @@ public class Player : MonoBehaviour
     {
         yield return new WaitForSeconds(0.8f);
         gameManger.SetNextPlayer();
-        Destroy(this.gameObject);
+        Destroy(this.GetComponent<Player>());
     }
 
     private void OnTriggerStay2D(Collider2D collision)
