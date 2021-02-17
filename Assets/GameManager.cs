@@ -54,7 +54,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            if(redTeamScore>greenTeamScore)
+            /*if(redTeamScore>greenTeamScore)
             {
                 UIManager.instance.SetGameOverText("Red Team Wins");
             }
@@ -65,7 +65,8 @@ public class GameManager : MonoBehaviour
             else
             {
                 UIManager.instance.SetGameOverText("Game Tie");
-            }
+            }*/
+            UIManager.instance.SetGameOverText("Game Over");
             UIManager.instance.gameOverPanel.SetActive(true);
         }
        
