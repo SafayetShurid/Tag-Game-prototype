@@ -24,6 +24,11 @@ public class AI : MonoBehaviour
 
     private Transform currentDestination;
 
+    private Animator animator;
+
+    private float lastPositionX;
+    private float _time = 1f;
+
     public enum AIState
     {
         chasing, patroling
@@ -31,7 +36,11 @@ public class AI : MonoBehaviour
 
     void Start()
     {
-        isAtStartingPoint = true;
+        Application.targetFrameRate = 60;
+        isAtEndPoint =true;
+        lastPositionX = transform.localPosition.x;
+        
+        animator = GetComponent<Animator>();
         
     }
 
@@ -57,17 +66,42 @@ public class AI : MonoBehaviour
             Patrol();
           
         }
+
+       
+
+
+           // animator.SetFloat("Horizontal", transform.localPosition.x);
+            animator.SetFloat("Vertical", 0);
+            animator.SetBool("isWalking", true);
+        _time -= speed*Time.deltaTime;
+        if (_time <= 0)
+        {
+            _time = 1f;
+           // Debug.Log();
+            animator.SetFloat("Horizontal", transform.localPosition.x - lastPositionX);
+            lastPositionX = transform.localPosition.x;
+           
+        }
+
+       
+        
+        
     }
 
     private void CheckActivePlayer()
-    {        
-        player = GameManager.instance.currentPlayer.GetComponent<Player>();    
+    {
+        if (GameManager.instance.currentPlayer!=null)
+        {
+            player = GameManager.instance.currentPlayer.GetComponent<Player>();
+        }
+     
     }
 
     private void ChasePlayer()
     {
 
         transform.position = Vector2.MoveTowards(transform.position, player.transform.position, speed * Time.deltaTime);
+       
         aiState = AIState.chasing;
         isChasing = true;
 
@@ -94,7 +128,7 @@ public class AI : MonoBehaviour
             isAtEndPoint = false;
             isAtStartingPoint = true;
         }
-
+        
     }  
 
     private bool CheckPlayerInRange()

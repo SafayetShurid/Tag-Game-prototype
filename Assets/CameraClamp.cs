@@ -26,7 +26,11 @@ public class CameraClamp : MonoBehaviour
         }
         else
         {
-            target = GameManager.instance.currentPlayer.transform;
+            if(GameManager.instance.currentPlayer!=null)
+            {
+                target = GameManager.instance.currentPlayer.transform;
+            }
+          
         }
        
 

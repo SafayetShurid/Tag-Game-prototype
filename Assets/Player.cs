@@ -6,17 +6,17 @@ public class Player : MonoBehaviour
 {
     public float speed;
     public FixedJoystick fixedJoystick;
-    public Rigidbody2D rb;
+    private Rigidbody2D rb;
 
     private bool inSafeZone;
 
     private GameManager gameManger;
 
-    public Animator animator;
-
+    private Animator animator;
+    private Vector2 movement;
     public void Awake()
     {
-        fixedJoystick = GameObject.Find("Fixed Joystick").GetComponent<FixedJoystick>();
+      //  fixedJoystick = GameObject.Find("Fixed Joystick").GetComponent<FixedJoystick>();
         speed = 5;
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
@@ -29,12 +29,16 @@ public class Player : MonoBehaviour
 
     public void FixedUpdate()
     {
-        float x = fixedJoystick.Horizontal;
-        float y = fixedJoystick.Vertical;
-        rb.velocity = new Vector2(x * speed, y * speed);
+        // float x = fixedJoystick.Horizontal;
+        // float y = fixedJoystick.Vertical;
 
-        if(rb.velocity.magnitude>0)
+        movement.x = Input.GetAxis("Horizontal");
+        movement.y = Input.GetAxis("Vertical");
+
+        if (movement != Vector2.zero)
         {
+            animator.SetFloat("Horizontal", movement.x);
+            animator.SetFloat("Vertical", movement.y);
             animator.SetBool("isWalking", true);
         }
         else
@@ -42,9 +46,13 @@ public class Player : MonoBehaviour
             animator.SetBool("isWalking", false);
         }
 
+        //rb.velocity = new Vector2(x * speed, y * speed);
+        rb.MovePosition(rb.position + (movement * speed * Time.fixedDeltaTime));
 
-        float posX = Mathf.Clamp(transform.position.x, -23f, 12f);
-        float posY = Mathf.Clamp(transform.position.y, -19f, 19f);
+        
+
+        float posX = Mathf.Clamp(transform.position.x, -17f, 10f);
+        float posY = Mathf.Clamp(transform.position.y, -5f, 13f);
 
         transform.position = new Vector3(posX, posY, 0);
     }
