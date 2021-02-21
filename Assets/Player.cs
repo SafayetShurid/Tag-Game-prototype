@@ -17,16 +17,21 @@ public class Player : MonoBehaviour
     private Vector2 movement;
 
     public PlayerType playerType;
+    public bool enemyTouchedPlayer;
+
+    private float lastPositionX;
+    private float lastPositionY;
+    private float _time = 1.1f;
 
     public enum PlayerType
     {
-        GREEN,RED
+        GREEN, RED
     }
-    
+
     public void Awake()
     {
-      //  fixedJoystick = GameObject.Find("Fixed Joystick").GetComponent<FixedJoystick>();
-        speed = 15;
+        //  fixedJoystick = GameObject.Find("Fixed Joystick").GetComponent<FixedJoystick>();
+        speed = 5;
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
     }
@@ -35,6 +40,8 @@ public class Player : MonoBehaviour
     {
         gameManger = GameManager.instance;
         startingPoint = transform.localPosition;
+        lastPositionX = transform.localPosition.x;
+        lastPositionY = transform.localPosition.y;
     }
 
     public void FixedUpdate()
@@ -57,9 +64,35 @@ public class Player : MonoBehaviour
         }
 
         //rb.velocity = new Vector2(x * speed, y * speed);
-        rb.MovePosition(rb.position + (movement * speed * Time.fixedDeltaTime));
+        if (!enemyTouchedPlayer)
+        {
+            rb.MovePosition(rb.position + (movement * speed * Time.fixedDeltaTime));
+        }
+        else
+        {
+            transform.position = Vector2.MoveTowards(transform.position, startingPoint, Time.deltaTime * speed);
+            _time -= speed * Time.deltaTime;
+            if (_time <= 0)
+            {
+                _time = 1.1f;
+                Debug.Log(transform.localPosition.x - lastPositionX);
+                animator.SetFloat("Horizontal", transform.localPosition.x - lastPositionX);
+                animator.SetFloat("Vertical", transform.localPosition.y - lastPositionY);
+                lastPositionY = transform.localPosition.y;
+                lastPositionX = transform.localPosition.x;
 
-        
+            }
+            if (Vector2.Distance(transform.position, startingPoint) < 0.02f)
+            {
+                enemyTouchedPlayer = false;
+                gameManger.SetNextPlayer();
+                Destroy(this.GetComponent<Player>());
+
+            }
+        }
+
+
+
 
         float posX = Mathf.Clamp(transform.position.x, -17f, 10f);
         float posY = Mathf.Clamp(transform.position.y, -7.5f, 13f);
@@ -87,43 +120,46 @@ public class Player : MonoBehaviour
 
         else if (collision.CompareTag("Enemy"))
         {
-            gameManger.RedScoreUp();
-            gameManger.SetNextPlayer();
+
+
             SoundManager.instance.PlayDamageSound();
-            if (!inSafeZone)
-            {
-                Destroy(this.gameObject);
-            }
+            enemyTouchedPlayer = true;
+            
 
         }
 
         else if (collision.CompareTag("EndZone"))
         {
             inSafeZone = true;
-            endZoneTouched = true;           
+            endZoneTouched = true;
 
         }
 
         else if (collision.CompareTag("StartZone"))
         {
             inSafeZone = true;
-            if(endZoneTouched)
+            if (endZoneTouched)
             {
-                if(playerType.Equals(PlayerType.GREEN))
+                if (playerType.Equals(PlayerType.GREEN))
                 {
                     gameManger.GreenScoreUp();
                 }
-                else if(playerType.Equals(PlayerType.RED))
+                else if (playerType.Equals(PlayerType.RED))
                 {
                     gameManger.RedScoreUp();
                 }
-               
+
                 SoundManager.instance.PlaywinSound();
                 StartCoroutine(EndPointReached());
             }
 
         }
     }
+
+
+  
+
+
 
     IEnumerator EndPointReached()
     {

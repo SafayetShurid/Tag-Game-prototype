@@ -20,10 +20,11 @@ public class GameManager : MonoBehaviour
 
     public static GameManager instance;
 
-   
+    private bool lastRound = false;
+
     public GameObject[] enemies;
 
-    public float _time = 60;
+    public float _time = 10;
 
     public void Awake()
     {
@@ -46,6 +47,40 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         _time -= Time.deltaTime;
+        if(_time<=0)
+        {
+            if(!lastRound)
+            {
+                UIManager.instance.roundBPanel.SetActive(true);
+                RoundFinished();
+            }
+            else
+            {
+                if (lastRound)
+                {
+                    if (redTeamScore > greenTeamScore)
+                    {
+                        UIManager.instance.SetGameOverText("Red Team Wins");
+                    }
+                    else if (greenTeamScore > redTeamScore)
+                    {
+                        UIManager.instance.SetGameOverText("Green Team Wins");
+                    }
+                    else
+                    {
+                        UIManager.instance.SetGameOverText("Game Tie");
+                    }
+                    UIManager.instance.gameOverPanel.SetActive(true);
+                }
+                else
+                {
+
+                    UIManager.instance.roundBPanel.SetActive(true);
+                    RoundFinished();
+                }
+
+            }
+        }
     }
 
     public void RedScoreUp()
@@ -68,27 +103,37 @@ public class GameManager : MonoBehaviour
             if(roundFinished)
             {
                 currentPlayer.GetComponent<Player>().playerType = Player.PlayerType.RED;
+                lastRound = true;
             }
         }
         else
         {
-            /*if(redTeamScore>greenTeamScore)
+            if(lastRound)
             {
-                UIManager.instance.SetGameOverText("Red Team Wins");
-            }
-            else if(greenTeamScore>redTeamScore)
-            {
-                UIManager.instance.SetGameOverText("Green Team Wins");
+                if (redTeamScore > greenTeamScore)
+                {
+                    UIManager.instance.SetGameOverText("Red Team Wins");
+                }
+                else if (greenTeamScore > redTeamScore)
+                {
+                    UIManager.instance.SetGameOverText("Green Team Wins");
+                }
+                else
+                {
+                    UIManager.instance.SetGameOverText("Game Tie");
+                }
+                UIManager.instance.gameOverPanel.SetActive(true);
             }
             else
             {
-                UIManager.instance.SetGameOverText("Game Tie");
-            }*/
-            // UIManager.instance.SetGameOverText("Game Over");
-            //  UIManager.instance.gameOverPanel.SetActive(true);
 
-            UIManager.instance.roundBPanel.SetActive(true);
-            RoundFinished();
+                UIManager.instance.roundBPanel.SetActive(true);
+                RoundFinished();
+            }
+         
+            // UIManager.instance.SetGameOverText("Game Over");
+             
+
            
         }
        
