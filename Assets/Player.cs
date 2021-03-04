@@ -9,6 +9,7 @@ public class Player : MonoBehaviour
     private Rigidbody2D rb;
     public Vector3 startingPoint;
 
+    [SerializeField]
     private bool inSafeZone;
     private bool endZoneTouched;
     private GameManager gameManger;
@@ -170,19 +171,17 @@ public class Player : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        if (collision.CompareTag("SafeZone"))
+        if (collision.CompareTag("SafeZone") || collision.CompareTag("StartZone"))
         {
             inSafeZone = true;
-
         }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.CompareTag("SafeZone"))
+        if (collision.CompareTag("SafeZone") || collision.CompareTag("StartZone"))
         {
             inSafeZone = false;
-
         }
     }
 

@@ -22,8 +22,8 @@ public class AI : MonoBehaviour
 
     private bool middleRoundTripped;
     private bool justFromEndPoint;
-    
 
+    public bool ifPlayerInRange;
 
     public Player player;
 
@@ -38,7 +38,7 @@ public class AI : MonoBehaviour
 
     private float lastPositionX;
     private float lastPositionY;
-    private float _time = 1.1f;
+    private float _time = 1.0f;
 
     public enum AIState
     {
@@ -66,7 +66,7 @@ public class AI : MonoBehaviour
     {
         CheckActivePlayer();
 
-        if (CheckPlayerInRange())
+        if (ifPlayerInRange=CheckPlayerInRange())
         {
             if (!player.InSafeZone())
             {
@@ -94,7 +94,7 @@ public class AI : MonoBehaviour
         _time -= speed * Time.deltaTime;
         if (_time <= 0)
         {
-            _time = 1.1f;
+            _time = 1.0f;
              Debug.Log(transform.localPosition.x - lastPositionX);
             animator.SetFloat("Horizontal", transform.localPosition.x - lastPositionX);
             animator.SetFloat("Vertical", transform.localPosition.y - lastPositionY);
