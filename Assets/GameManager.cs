@@ -170,6 +170,7 @@ public class GameManager : MonoBehaviour
         players[0].AddComponent<Player>();
         players[0].GetComponent<Player>().playerType = Player.PlayerType.RED;
         currentPlayerIndex = 0;
+        currentPlayer = players[0];
         _time = 60f;
     }
 

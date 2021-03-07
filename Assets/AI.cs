@@ -68,15 +68,19 @@ public class AI : MonoBehaviour
 
         if (ifPlayerInRange=CheckPlayerInRange())
         {
-            if (!player.InSafeZone())
+            if(player!=null)
             {
-                ChasePlayer();
-            }
-            else
-            {
-                Patrol();
+                if (!player.InSafeZone())
+                {
+                    ChasePlayer();
+                }
+                else
+                {
+                    Patrol();
 
+                }
             }
+           
 
         }
         else
